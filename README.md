@@ -1,6 +1,6 @@
 # Svelte-Swipe
 
-A highly customizable slide-to-action component for Svelte applications.
+A highly customizable swipe-to-action component for Svelte applications.
 
 ![Svelte-Swipe Demo](./assets/demo.png)
 
@@ -20,7 +20,7 @@ A highly customizable slide-to-action component for Svelte applications.
 
 ## Introduction
 
-Svelte-Swipe is a versatile slider component for Svelte applications that provides "slide to unlock" or "slide to confirm" functionality. It's fully customizable with extensive styling options and event callbacks.
+Svelte-Swipe is a versatile slider component for Svelte applications building on a html input element type range, that provides "swipe to unlock" or "swipe to confirm" functionality. It's fully customizable with extensive styling options and event callbacks.
 
 ## Installation
 
