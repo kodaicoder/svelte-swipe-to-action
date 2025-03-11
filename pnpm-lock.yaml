@@ -7,19 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@tailwindcss/postcss':
-        specifier: ^4.0.12
-        version: 4.0.12
-      '@tailwindcss/vite':
-        specifier: ^4.0.12
-        version: 4.0.12(vite@6.2.1(jiti@2.4.2)(lightningcss@1.29.2))
-      postcss:
-        specifier: ^8.5.3
-        version: 8.5.3
-      tailwindcss:
-        specifier: ^4.0.12
-        version: 4.0.12
     devDependencies:
       '@eslint/compat':
         specifier: ^1.2.5
@@ -42,6 +29,12 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.0
         version: 5.0.3(svelte@5.22.6)(vite@6.2.1(jiti@2.4.2)(lightningcss@1.29.2))
+      '@tailwindcss/postcss':
+        specifier: ^4.0.12
+        version: 4.0.12
+      '@tailwindcss/vite':
+        specifier: ^4.0.12
+        version: 4.0.12(vite@6.2.1(jiti@2.4.2)(lightningcss@1.29.2))
       eslint:
         specifier: ^9.18.0
         version: 9.22.0(jiti@2.4.2)
@@ -57,6 +50,9 @@ importers:
       phosphor-svelte:
         specifier: ^3.0.1
         version: 3.0.1(svelte@5.22.6)(vite@6.2.1(jiti@2.4.2)(lightningcss@1.29.2))
+      postcss:
+        specifier: ^8.5.3
+        version: 8.5.3
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
@@ -72,6 +68,9 @@ importers:
       svelte-check:
         specifier: ^4.0.0
         version: 4.1.5(svelte@5.22.6)(typescript@5.8.2)
+      tailwindcss:
+        specifier: ^4.0.12
+        version: 4.0.12
       typescript:
         specifier: ^5.0.0
         version: 5.8.2
