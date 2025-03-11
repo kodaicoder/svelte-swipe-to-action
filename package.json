@@ -1,6 +1,18 @@
 {
 	"name": "svelte-swipe",
-	"version": "0.0.1",
+	"version": "0.1.0",
+	"description": "A swipeable Svelte component",
+	"main": "dist/index.js",
+	"module": "dist/index.js",
+	"keywords": [
+		"svelte",
+		"swipe",
+		"component",
+		"swipe to unlock",
+		"swipe to"
+	],
+	"author": "Nutchapon Makelai",
+	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
@@ -46,6 +58,7 @@
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
 		"globals": "^16.0.0",
+		"phosphor-svelte": "^3.0.1",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"publint": "^0.3.2",
@@ -53,7 +66,11 @@
 		"svelte-check": "^4.0.0",
 		"typescript": "^5.0.0",
 		"typescript-eslint": "^8.20.0",
-		"vite": "^6.0.0"
+		"vite": "^6.0.0",
+		"@tailwindcss/postcss": "^4.0.12",
+		"@tailwindcss/vite": "^4.0.12",
+		"postcss": "^8.5.3",
+		"tailwindcss": "^4.0.12"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
