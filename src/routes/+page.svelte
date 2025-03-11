@@ -42,7 +42,7 @@
 </script>
 
 <div class="grid place-content-center my-8">
-	<h1 class="font-bold text-3xl text-center mb-3 underline">Svelte-Swipe</h1>
+	<h1 class="font-bold text-3xl text-center mb-3 underline">Svelte-Swipe-To-Action</h1>
 	<Swipe
 		id="swipeElement"
 		bind:status

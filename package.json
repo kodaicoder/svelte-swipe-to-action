@@ -1,5 +1,5 @@
 {
-	"name": "svelte-swipe",
+	"name": "svelte-swipe-to-action",
 	"version": "0.1.0",
 	"description": "A swipeable Svelte component",
 	"main": "dist/index.js",

@@ -1,8 +1,8 @@
-# Svelte-Swipe
+# Svelte-Swipe-To-Action
 
 A highly customizable swipe-to-action component for Svelte applications.
 
-![Svelte-Swipe Demo](./static/demo/svelte-swipe-demo.png)
+![Svelte-Swipe-To-Action Demo](./static/demo/svelte-swipe-demo.png)
 
 ## Table of Contents
 
@@ -20,19 +20,25 @@ A highly customizable swipe-to-action component for Svelte applications.
 
 ## Introduction
 
-Svelte-Swipe is a versatile slider component for Svelte applications building on a html input element type range, that provides "swipe to unlock" or "swipe to confirm" functionality. It's fully customizable with extensive styling options and event callbacks.
+Svelte-Swipe-To-Action is a versatile slider component for Svelte applications building on a html input element type range, that provides "swipe to unlock" or "swipe to confirm" functionality. It's fully customizable with extensive styling options and event callbacks.
 
 ## Installation
 
 ```bash
-npm install svelte-swipe
+npm install svelte-swipe-to-action
+```
+
+or
+
+```bash
+pnpm i svelte-swipe-to-action
 ```
 
 ## Basic Usage
 
 ```svelte
 <script>
-	import { Swipe } from 'svelte-swipe';
+	import Swipe from 'svelte-swipe-to-action';
 
 	let status = false;
 
@@ -127,7 +133,7 @@ npm install svelte-swipe
 
 ```svelte
 <script>
-	import { Swipe } from 'svelte-swipe';
+	import Swipe from 'svelte-swipe';
 	let unlocked = false;
 </script>
 
@@ -148,7 +154,7 @@ npm install svelte-swipe
 
 ```svelte
 <script>
-	import { Swipe } from 'svelte-swipe';
+	import Swipe from 'svelte-swipe';
 	let confirmed = false;
 </script>
 
@@ -176,7 +182,7 @@ npm install svelte-swipe
 
 ```svelte
 <script>
-	import { Swipe } from 'svelte-swipe';
+	import Swipe from 'svelte-swipe';
 	import { HandSwipeRight, Heart } from 'phosphor-svelte';
 </script>
 
@@ -194,7 +200,7 @@ npm install svelte-swipe
 
 ```svelte
 <script>
-	import { Swipe } from 'svelte-swipe';
+	import Swipe from 'svelte-swipe';
 	let message = '';
 
 	function handleComplete(event, isComplete, value) {
