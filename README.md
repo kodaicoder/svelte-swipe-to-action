@@ -2,7 +2,7 @@
 
 A highly customizable slide-to-action component for Svelte applications.
 
-![Svelte-Swipe Demo](./assets/demo.png)
+![Svelte-Swipe Demo](./static/demo/svelte-swipe-demo.png)
 
 ## Table of Contents
 
