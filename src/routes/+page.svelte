@@ -10,14 +10,15 @@
 
 	let width = $state(400);
 	let height = $state(50);
+	let rtlMode = $state(false);
 	let threshold = $state(80);
 	let label = $state('Slide to unlock');
 	let completeLabel = $state('Unlocked');
 
-	let containerPadding = $state(0);
+	let containerPadding = $state(2);
 	let containerBackgroundColor = $state('#ffffff');
-	let containerBorderColor = $state('#ffffff');
-	let containerBorderWidth = $state(0);
+	let containerBorderColor = $state('#000000');
+	let containerBorderWidth = $state(2);
 	let containerRadius = $state(0);
 	let trackBackgroundColor = $state('#ffffff');
 	let completeTrackBackgroundColor = $state('#4caf50');
@@ -53,6 +54,7 @@
 		{oncancel}
 		bind:width
 		bind:height
+		bind:rtlMode
 		bind:threshold
 		bind:label
 		bind:completeLabel
@@ -117,6 +119,10 @@
 		<div>
 			Complete label text :
 			<input id="completeLabel" type="text" class="border px-2" bind:value={completeLabel} />
+		</div>
+		<div>
+			Right to left mode :
+			<input id="rtlMode" type="checkbox" class="size-4" bind:checked={rtlMode} />
 		</div>
 	</div>
 	<div class="grid gap-4 p-2 border border-gray-300">

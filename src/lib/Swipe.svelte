@@ -57,6 +57,8 @@
 		width?: number;
 		/** The height of the slider. (default value is 50) */
 		height?: number;
+		/** Right to left mode (default is disable)*/
+		rtlMode?: boolean;
 		/** Callback function triggered when the slider is checked. */
 		oncomplete?: (event: Event, isComplete: boolean, value: number) => void;
 		/** Callback function triggered when the slider is canceled. */
@@ -99,6 +101,7 @@
 		threshold = $bindable(80),
 		width = $bindable(400),
 		height = $bindable(50),
+		rtlMode = $bindable(false),
 		oncomplete = () => {},
 		oncancel = () => {},
 		onpassthreshold = () => {},
@@ -177,7 +180,29 @@
 		}
 	}
 
-	onMount(() => {
+	function onkeyup(ev: KeyboardEvent) {
+		//if it enter key then should set value too 100
+		console.log(ev.key);
+		if (ev.key.toLowerCase() !== 'enter') {
+			ev.preventDefault();
+			return;
+		}
+		if (!status) {
+			status = true;
+			value = 100;
+			sliderValue = 100;
+			onpassthreshold(ev, true, sliderValue);
+		} else {
+			status = false;
+			value = 0;
+			sliderValue = 0;
+			onpassthreshold(ev, false, sliderValue);
+		}
+		onchange(ev);
+	}
+
+	$effect(() => {
+		rtlMode;
 		if (chevronContainer) {
 			const svgHtml = chevronContainer.innerHTML;
 			const cleanSvgHtml = svgHtml.replace(/>\s+</g, '><').trim();
@@ -211,7 +236,13 @@
 	{#if checkMark}
 		{@render checkMark()}
 	{:else}
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			width="24"
+			height="24"
+			viewBox="0 0 24 24"
+			style={`transform: scaleX(${rtlMode ? -1 : 1})`}
+		>
 			<path
 				fill="currentColor"
 				d="M9.86 18a1 1 0 0 1-.73-.32l-4.86-5.17a1 1 0 1 1 1.46-1.37l4.12 4.39l8.41-9.2a1 1 0 1 1 1.48 1.34l-9.14 10a1 1 0 0 1-.73.33Z"
@@ -228,6 +259,7 @@
 	style:--container__border-color={containerBorderColor}
 	style:--container__border-width={containerBorderWidth + 'px'}
 	style:--container__radius={containerRadius + 'px'}
+	style:--transform__scaleX={`${rtlMode ? -1 : 1}`}
 	class={`container ${containerClass}`}
 >
 	<div
@@ -262,9 +294,17 @@
 			type="range"
 			min="0"
 			max="100"
+			aria-label={label}
+			aria-valuemin="0"
+			aria-valuemax="100"
+			aria-valuenow={sliderValue}
+			aria-details={`${label} with passed value at ${passThreshold}, you can press 'Enter' to change a state.`}
+			aria-live="assertive"
+			aria-disabled={!!rest.disabled}
 			bind:value={sliderValue}
 			{oninput}
 			{onchange}
+			{onkeyup}
 			style={`width: ${width}px`}
 			style:--thumb__color={passThreshold ? completeThumbColor : thumbColor}
 			style:--thumb__radius={thumbRadius + 'px'}
@@ -287,6 +327,12 @@
 		background-color: var(--container__color);
 		border-radius: var(--container__radius);
 		border: var(--container__border-width) solid var(--container__border-color);
+		transform: scaleX(var(--transform__scaleX));
+	}
+	.container:has(.input-range:focus) {
+		/* outline: 2px solid var(--container__border-color); */
+		outline: 2px solid black;
+		outline-offset: 2px;
 	}
 	.track {
 		width: var(--width);
@@ -345,7 +391,7 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%) scaleX(var(--transform__scaleX));
 		z-index: 5;
 		opacity: var(--label__opacity);
 		color: var(--label__color);
@@ -356,7 +402,7 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%);
+		transform: translate(-50%, -50%) scaleX(var(--transform__scaleX));
 		z-index: 5;
 		opacity: var(--complete_label__opacity);
 		color: var(--complete_label__color);
