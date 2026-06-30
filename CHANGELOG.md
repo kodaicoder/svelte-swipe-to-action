@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - 2026-06-30
+
+### Added
+
+- **`labelSize` option** — text size preset for label and completeLabel: `'xs'` | `'sm'` | `'md'` | `'lg'` | `'xl'`. Scales dynamically with the track height (default: `'md'`)
+- **Text ellipsis** — labels now truncate with `…` when text exceeds the available track width
+- **Dynamic font size** — calculated as `clamp(10px, height × multiplier, 24px)` via CSS variable, respecting the `labelSize` preset
+
+### Changed
+
+- `.label` and `.complete_label` now use `white-space: nowrap; overflow: hidden; text-overflow: ellipsis` for clean single-line display
+- Demo page: added `labelSize` dropdown in the Slider controller section and a new row in the options docs table
+
 ## [1.0.1] - 2026-06-30
 
 ### Fixed

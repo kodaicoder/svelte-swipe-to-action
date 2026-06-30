@@ -2,7 +2,7 @@
 	import '../app.css';
 	import Swipe from '$lib/Swipe.svelte';
 	import type { SwipeOptions } from '$lib/Swipe.svelte';
-	import { GithubLogoIcon } from 'phosphor-svelte';
+	import { GithubLogoIcon, EyedropperIcon } from 'phosphor-svelte';
 
 	// ── State ────────────────────────────────────────────────
 	let status = $state(false);
@@ -33,7 +33,8 @@
 		completeThumbColor: '#16a34a',
 		thumbRadius: 8,
 		labelColor: '#6b7280',
-		completeLabelColor: '#ffffff'
+		completeLabelColor: '#ffffff',
+		labelSize: 'md'
 	});
 
 	let events = $state<{ type: string; time: string; detail: string }[]>([]);
@@ -132,7 +133,8 @@
 		completeThumbColor: '#16a34a',
 		thumbRadius: 8,
 		labelColor: '#6b7280',
-		completeLabelColor: '#ffffff'
+		completeLabelColor: '#ffffff',
+		labelSize: 'md'
 	};
 
 	// ── Code output ──────────────────────────────────────────
@@ -290,43 +292,44 @@
 	<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
 		<!-- ─── A: Component Showcase ──────────── -->
 		<section
-			class="rounded-xl p-6 border border-gray-800 flex flex-col items-center gap-6 transition-colors"
+			class="rounded-xl p-4 md:p-6 border border-gray-800 flex flex-col items-center gap-6 transition-colors"
 			style:background-color={previewBg}
 		>
 			<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide self-start">
 				Preview
 			</h3>
-			<div class="p-8 rounded-xl">
-				{#if customIcons}
-					<Swipe
-						id="swipeElement"
-						bind:status
-						bind:value
-						bind:hold
-						options={opts}
-						chevronIconSvg={chevronSvg}
-						completeIconSvg={completeSvg}
-						{oninput}
-						{oncomplete}
-						{oncancel}
-						{onpassthreshold}
-					/>
-				{:else}
-					<Swipe
-						id="swipeElement"
-						bind:status
-						bind:value
-						bind:hold
-						options={opts}
-						{oninput}
-						{oncomplete}
-						{oncancel}
-						{onpassthreshold}
-					/>
-				{/if}
+			<div class="flex w-full overflow-auto">
+				<div class="mx-auto py-4 rounded-xl">
+					{#if customIcons}
+						<Swipe
+							id="swipeElement"
+							bind:status
+							bind:value
+							bind:hold
+							options={opts}
+							chevronIconSvg={chevronSvg}
+							completeIconSvg={completeSvg}
+							{oninput}
+							{oncomplete}
+							{oncancel}
+							{onpassthreshold}
+						/>
+					{:else}
+						<Swipe
+							id="swipeElement"
+							bind:status
+							bind:value
+							bind:hold
+							options={opts}
+							{oninput}
+							{oncomplete}
+							{oncancel}
+							{onpassthreshold}
+						/>
+					{/if}
+				</div>
 			</div>
-
-			<div class="grid grid-cols-4 gap-3 text-center w-full max-w-sm">
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center w-full max-w-sm">
 				<div class="bg-gray-800 rounded-lg p-2">
 					<div class="text-xs text-gray-500">STATUS</div>
 					<div
@@ -344,7 +347,12 @@
 				</div>
 				<div class="bg-gray-800 rounded-lg p-2">
 					<div class="text-xs text-gray-500">HOLD</div>
-					<div class="text-sm font-mono" class:text-yellow-400={hold} class:text-gray-400={!hold} data-testid="state-hold">
+					<div
+						class="text-sm font-mono"
+						class:text-yellow-400={hold}
+						class:text-gray-400={!hold}
+						data-testid="state-hold"
+					>
 						{hold ? 'yes' : 'no'}
 					</div>
 				</div>
@@ -363,16 +371,20 @@
 			</div>
 
 			<label class="text-xs text-gray-400 flex items-center gap-2">
-				<input
-					type="color"
-					bind:value={previewBg}
-					class="w-6 h-6 rounded cursor-pointer border border-gray-600"
-					data-testid="preview-bg-input"
-				/>
-				Preview background
+				<label class="flex gap-1 justify-center items-center">
+					<input
+						type="color"
+						bind:value={previewBg}
+						class="w-6 h-6 rounded cursor-pointer border border-gray-600"
+						data-testid="preview-bg-input"
+					/>
+					<span class="inline-flex align-middle">
+						<EyedropperIcon size={18} />Preview background</span
+					>
+				</label>
 				<button
 					onclick={() => (previewBg = '#111827')}
-					class="text-[10px] text-gray-500 hover:text-gray-300 ml-1 cursor-pointer"
+					class="rounded text-[10px] text-gray-500 py-1 px-2 hover:bg-red-400 ml-1 cursor-pointer"
 				>
 					reset
 				</button>
@@ -381,7 +393,12 @@
 
 		<!-- ─── B: Events Log ──────────────────── -->
 		<section class="bg-gray-900 rounded-xl p-5 border border-gray-800">
-			<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3" data-testid="events-heading">Events</h3>
+			<h3
+				class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3"
+				data-testid="events-heading"
+			>
+				Events
+			</h3>
 			{#if events.length === 0}
 				<p class="text-xs text-gray-600">Interact with the slider to see events</p>
 			{:else}
@@ -484,8 +501,27 @@
 					</label>
 				</div>
 				<label class="text-xs text-gray-400 flex items-center gap-2">
-					<input type="checkbox" bind:checked={opts.rtlMode} class="accent-green-500" data-testid="checkbox-rtl" />
+					<input
+						type="checkbox"
+						bind:checked={opts.rtlMode}
+						class="accent-green-500"
+						data-testid="checkbox-rtl"
+					/>
 					Right-to-left mode
+				</label>
+				<label class="text-xs text-gray-400 block mt-3">
+					Label text size
+					<select
+						bind:value={opts.labelSize}
+						class="w-full mt-1 bg-gray-800 border border-gray-700 rounded px-2 py-1 text-sm text-gray-200"
+						data-testid="select-label-size"
+					>
+						<option value="xs">xs</option>
+						<option value="sm">sm</option>
+						<option value="md">md</option>
+						<option value="lg">lg</option>
+						<option value="xl">xl</option>
+					</select>
 				</label>
 			</div>
 
@@ -500,7 +536,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-track-bg"
 						/>
-						Track bg
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Track bg
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -509,7 +547,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-track-done"
 						/>
-						Track done
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Track done
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -518,7 +558,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-track-border"
 						/>
-						Track border
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Track border
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -527,7 +569,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-thumb"
 						/>
-						Thumb
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Thumb
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -536,7 +580,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-thumb-done"
 						/>
-						Thumb done
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Thumb done
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -545,7 +591,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-label"
 						/>
-						Label
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Label
+						</span>
 					</label>
 					<label class="text-xs text-gray-400 flex items-center gap-2">
 						<input
@@ -554,7 +602,9 @@
 							class="w-6 h-6 rounded cursor-pointer border border-gray-600"
 							data-testid="color-done-label"
 						/>
-						Done label
+						<span class="inline-flex align-middle">
+							<EyedropperIcon size={18} />&nbsp;Done label
+						</span>
 					</label>
 				</div>
 				<div class="grid grid-cols-3 gap-3">
@@ -686,7 +736,7 @@
 
 	<!-- ════════════════ DOCS ═══════════════════ -->
 	<div class="max-w-7xl mx-auto p-6">
-		<div class="bg-gray-900 rounded-xl p-6 border border-gray-800 space-y-6">
+		<div class="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 space-y-6">
 			<h2 class="text-lg font-bold">Props</h2>
 			<div class="overflow-x-auto">
 				<table class="doc-table w-full text-sm text-left">
@@ -745,7 +795,7 @@
 			</div>
 		</div>
 
-		<div class="bg-gray-900 rounded-xl p-6 border border-gray-800 mt-6 space-y-4">
+		<div class="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mt-6 space-y-4">
 			<h2 class="text-lg font-bold">Events</h2>
 			<div class="overflow-x-auto">
 				<table class="doc-table w-full text-sm text-left">
@@ -788,175 +838,186 @@
 			</div>
 		</div>
 
-		<div class="bg-gray-900 rounded-xl p-6 border border-gray-800 mt-6 space-y-4">
+		<div class="bg-gray-900 rounded-xl p-4 md:p-6 border border-gray-800 mt-6 space-y-4">
 			<h2 class="text-lg font-bold">Swipe Options</h2>
 			<p class="text-sm text-gray-400">
 				All properties in the <code class="text-xs bg-gray-800 px-1 rounded">options</code> object:
 			</p>
-			<table class="doc-table w-full text-sm text-left">
-				<thead>
-					<tr class="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wide">
-						<th class="py-2 pr-4">Option</th><th class="py-2 pr-4">Type</th><th class="py-2 pr-4"
-							>Default</th
-						><th class="py-2">Description</th>
-					</tr>
-				</thead>
-				<tbody class="text-gray-300 divide-y divide-gray-800">
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">width</td><td class="py-2 pr-4 text-xs"
-							>number</td
-						><td class="py-2 pr-4 text-xs">400</td><td class="py-2 text-xs"
-							>Slider width in pixels</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">height</td><td class="py-2 pr-4 text-xs"
-							>number</td
-						><td class="py-2 pr-4 text-xs">50</td><td class="py-2 text-xs"
-							>Slider height in pixels (also sets thumb size)</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">threshold</td><td class="py-2 pr-4 text-xs"
-							>number</td
-						><td class="py-2 pr-4 text-xs">80</td><td class="py-2 text-xs"
-							>Percentage (0-100) of slide required to confirm</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">label</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">Slide to ...</td><td class="py-2 text-xs"
-							>Text shown on the slider before completion</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeLabel</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">Complete</td><td class="py-2 text-xs"
-							>Text shown after the slider is confirmed</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">rtlMode</td><td class="py-2 pr-4 text-xs"
-							>boolean</td
-						><td class="py-2 pr-4 text-xs">false</td><td class="py-2 text-xs"
-							>Enables right-to-left sliding direction</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">trackColor</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">#fff</td><td class="py-2 text-xs"
-							>Background color of the slider track</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeTrackColor</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">#4caf50</td><td class="py-2 text-xs"
-							>Track background color after confirmed</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">trackBorderColor</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">transparent</td><td class="py-2 text-xs"
-							>Border color of the track</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">trackBorderWidth</td><td
-							class="py-2 pr-4 text-xs">number</td
-						><td class="py-2 pr-4 text-xs">1</td><td class="py-2 text-xs"
-							>Track border width in pixels</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">trackRadius</td><td class="py-2 pr-4 text-xs"
-							>number</td
-						><td class="py-2 pr-4 text-xs">0</td><td class="py-2 text-xs"
-							>Track border radius in pixels</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">trackClass</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
-							>Additional CSS class for the track</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeTrackClass</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
-							>CSS class for the track when confirmed</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">thumbColor</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">#ddd</td><td class="py-2 text-xs"
-							>Color of the slider thumb (handle)</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeThumbColor</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">#ddd</td><td class="py-2 text-xs"
-							>Thumb color after confirmed</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">thumbRadius</td><td class="py-2 pr-4 text-xs"
-							>number</td
-						><td class="py-2 pr-4 text-xs">0</td><td class="py-2 text-xs"
-							>Thumb border radius in pixels</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">labelColor</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">#000</td><td class="py-2 text-xs"
-							>Text color of the label</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">labelClass</td><td class="py-2 pr-4 text-xs"
-							>string</td
-						><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
-							>Additional CSS class for the label</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeLabelColor</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">#000</td><td class="py-2 text-xs"
-							>Text color of the completed label</td
-						></tr
-					>
-					<tr
-						><td class="py-2 pr-4 font-mono text-xs">completeLabelClass</td><td
-							class="py-2 pr-4 text-xs">string</td
-						><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
-							>Additional CSS class for the completed label</td
-						></tr
-					>
-				</tbody>
-			</table>
+			<div class="overflow-x-auto">
+				<table class="doc-table w-full text-sm text-left">
+					<thead>
+						<tr class="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wide">
+							<th class="py-2 pr-4">Option</th><th class="py-2 pr-4">Type</th><th class="py-2 pr-4"
+								>Default</th
+							><th class="py-2">Description</th>
+						</tr>
+					</thead>
+					<tbody class="text-gray-300 divide-y divide-gray-800">
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">width</td><td class="py-2 pr-4 text-xs"
+								>number</td
+							><td class="py-2 pr-4 text-xs">400</td><td class="py-2 text-xs"
+								>Slider width in pixels</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">height</td><td class="py-2 pr-4 text-xs"
+								>number</td
+							><td class="py-2 pr-4 text-xs">50</td><td class="py-2 text-xs"
+								>Slider height in pixels (also sets thumb size)</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">threshold</td><td class="py-2 pr-4 text-xs"
+								>number</td
+							><td class="py-2 pr-4 text-xs">80</td><td class="py-2 text-xs"
+								>Percentage (0-100) of slide required to confirm</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">label</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">Slide to ...</td><td class="py-2 text-xs"
+								>Text shown on the slider before completion</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeLabel</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">Complete</td><td class="py-2 text-xs"
+								>Text shown after the slider is confirmed</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">rtlMode</td><td class="py-2 pr-4 text-xs"
+								>boolean</td
+							><td class="py-2 pr-4 text-xs">false</td><td class="py-2 text-xs"
+								>Enables right-to-left sliding direction</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">trackColor</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">#fff</td><td class="py-2 text-xs"
+								>Background color of the slider track</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeTrackColor</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">#4caf50</td><td class="py-2 text-xs"
+								>Track background color after confirmed</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">trackBorderColor</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">transparent</td><td class="py-2 text-xs"
+								>Border color of the track</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">trackBorderWidth</td><td
+								class="py-2 pr-4 text-xs">number</td
+							><td class="py-2 pr-4 text-xs">1</td><td class="py-2 text-xs"
+								>Track border width in pixels</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">trackRadius</td><td class="py-2 pr-4 text-xs"
+								>number</td
+							><td class="py-2 pr-4 text-xs">0</td><td class="py-2 text-xs"
+								>Track border radius in pixels</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">trackClass</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
+								>Additional CSS class for the track</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeTrackClass</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
+								>CSS class for the track when confirmed</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">thumbColor</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">#ddd</td><td class="py-2 text-xs"
+								>Color of the slider thumb (handle)</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeThumbColor</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">#ddd</td><td class="py-2 text-xs"
+								>Thumb color after confirmed</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">thumbRadius</td><td class="py-2 pr-4 text-xs"
+								>number</td
+							><td class="py-2 pr-4 text-xs">0</td><td class="py-2 text-xs"
+								>Thumb border radius in pixels</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">labelColor</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">#000</td><td class="py-2 text-xs"
+								>Text color of the label</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">labelClass</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
+								>Additional CSS class for the label</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeLabelColor</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">#000</td><td class="py-2 text-xs"
+								>Text color of the completed label</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">completeLabelClass</td><td
+								class="py-2 pr-4 text-xs">string</td
+							><td class="py-2 pr-4 text-xs">—</td><td class="py-2 text-xs"
+								>Additional CSS class for the completed label</td
+							></tr
+						>
+						<tr
+							><td class="py-2 pr-4 font-mono text-xs">labelSize</td><td class="py-2 pr-4 text-xs"
+								>string</td
+							><td class="py-2 pr-4 text-xs">'md'</td><td class="py-2 text-xs"
+								>Text size preset: 'xs', 'sm', 'md', 'lg', 'xl'. Scales with height</td
+							></tr
+						>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 
-	<footer
-		class="flex items-center gap-1 justify-center border-t border-gray-800 py-6 text-center text-xs text-gray-600"
-	>
-		svelte-swipe-to-action v1.0.0 — MIT License — Made with ❤️ by kodaicoder
-		<a
-			href="https://github.com/Kodaicoder/svelte-swipe"
-			class=" inline-flex bg-gray-800 hover:bg-gray-700 p-1 rounded-full transition-colors"
-			target="_blank"
-		>
-			<GithubLogoIcon size={18} color="#ffffff" weight="duotone" />
-		</a>
+	<footer class="border-t border-gray-800 py-6 text-center text-xs text-gray-600">
+		<p>
+			<small>
+				svelte-swipe-to-action v1.0.0 — MIT License — Made with ❤️ by kodaicoder
+				<a
+					class="p-1 inline-flex align-middle rounded-full text-slate-300 hover:bg-slate-300 hover:text-gray-800 transition-colors"
+					href="https://github.com/kodaicoder/svelte-swipe-to-action"
+					target="_blank"
+				>
+					<GithubLogoIcon size={18} weight="duotone" />
+				</a>
+			</small>
+		</p>
 	</footer>
 </div>

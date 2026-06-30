@@ -1,6 +1,6 @@
 {
 	"name": "svelte-swipe-to-action",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "A highly customizable swipe-to-action component for Svelte 5",
 	"main": "dist/index.js",
 	"module": "dist/index.js",

@@ -37,6 +37,9 @@
 		labelClass?: string;
 		completeLabelColor?: string;
 		completeLabelClass?: string;
+
+		/** Text size preset for label & completeLabel: 'xs' | 'sm' | 'md' | 'lg' | 'xl'. Scales with height. Default: 'md' */
+		labelSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 	}
 
 	export type SwipeProps = {
@@ -105,6 +108,9 @@
 	const labelClass = $derived(options.labelClass ?? '');
 	const completeLabelColor = $derived(options.completeLabelColor ?? '#000000');
 	const completeLabelClass = $derived(options.completeLabelClass ?? '');
+	const labelSize = $derived(options.labelSize ?? 'md');
+	const labelSizeMap: Record<string, number> = { xs: 0.2, sm: 0.28, md: 0.35, lg: 0.45, xl: 0.55 };
+	let labelFontSize = $derived(`clamp(10px, ${height * (labelSizeMap[labelSize] ?? 0.35)}px, 24px)`);
 
 	let sliderValue = $state(status ? 100 : 0);
 	let focused = $state(false);
@@ -242,6 +248,7 @@
 	style:--track__radius={trackRadius + 'px'}
 	class={`track ${trackClass}`.trim()}
 	class:focused
+	style:--label__font-size={labelFontSize}
 >
 	<p
 		class={`label ${labelClass}`}
@@ -389,6 +396,11 @@
 		z-index: 5;
 		opacity: var(--label__opacity);
 		color: var(--label__color);
+		font-size: var(--label__font-size);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: calc(100% - var(--height) * 1.4);
 	}
 
 	.complete_label {
@@ -400,6 +412,11 @@
 		z-index: 5;
 		opacity: var(--complete_label__opacity);
 		color: var(--complete_label__color);
+		font-size: var(--label__font-size);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: calc(100% - var(--height) * 1.4);
 	}
 
 	.progressbar {
