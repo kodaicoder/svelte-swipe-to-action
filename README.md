@@ -1,207 +1,181 @@
-# Svelte-Swipe-To-Action
+# svelte-swipe-to-action
 
-A highly customizable swipe-to-action component for Svelte applications.
+A highly customizable swipe-to-action component for Svelte 5.
+
+[![npm](https://img.shields.io/npm/v/svelte-swipe-to-action)](https://www.npmjs.com/package/svelte-swipe-to-action)
+[![license](https://img.shields.io/npm/l/svelte-swipe-to-action)](./LICENSE)
+
+[**Live Demo**](https://svelte-swipe-ashy.vercel.app/)
 
 ![Svelte-Swipe-To-Action Demo](./static/demo/svelte-swipe-demo.png)
-
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [Basic Usage](#basic-usage)
-- [Props](#props)
-  - [State Props](#state-props)
-  - [Appearance Props](#appearance-props)
-  - [Event Handlers](#event-handlers)
-  - [Custom Icons](#custom-icons)
-- [Examples](#examples)
-- [Development](#development)
-- [License](#license)
-
-## Introduction
-
-Svelte-Swipe-To-Action is a versatile slider component for Svelte applications building on a html input element type range, that provides "swipe to unlock" or "swipe to confirm" functionality. It's fully customizable with extensive styling options and event callbacks.
 
 ## Installation
 
 ```bash
 npm install svelte-swipe-to-action
+
+# or
+
+pnpm add svelte-swipe-to-action
 ```
 
-or
-
-```bash
-pnpm i svelte-swipe-to-action
-```
-
-## Basic Usage
+## Quick Start
 
 ```svelte
 <script>
 	import Swipe from 'svelte-swipe-to-action';
 
-	let status = false;
-
-	function handleComplete(event, isComplete, value) {
-		console.log('Action completed!', isComplete, value);
-	}
+	let confirmed = $state(false);
 </script>
 
 <Swipe
-	bind:status
 	label="Slide to confirm"
 	completeLabel="Confirmed!"
-	oncomplete={handleComplete}
+	bind:status={confirmed}
 />
 ```
 
-## Props
+## API
 
-### State Props
+### State Props (`$bindable`)
 
-| Prop        | Type      | Default      | Description                                          |
-| ----------- | --------- | ------------ | ---------------------------------------------------- |
-| `status`    | `boolean` | `false`      | Whether the slider is in completed state             |
-| `value`     | `number`  | `0` or `100` | The current value of the slider (0-100)              |
-| `hold`      | `boolean` | `false`      | Whether the slider is being held                     |
-| `threshold` | `number`  | `80`         | Percentage threshold required for completion (0-100) |
+These are two-way bindable state variables on the component.
 
-### Appearance Props
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `status` | `boolean` | `false` | Whether the slider is in completed state |
+| `value` | `number` | `0` | Current slider value (0–100) |
+| `hold` | `boolean` | `false` | Whether the thumb is being pressed/held |
 
-#### Container
+### Options (`options` prop)
 
-| Prop                   | Type     | Default         | Description                              |
-| ---------------------- | -------- | --------------- | ---------------------------------------- |
-| `width`                | `number` | `400`           | Width of the slider in pixels            |
-| `height`               | `number` | `50`            | Height of the slider in pixels           |
-| `containerPadding`     | `number` | `0`             | Padding of the container in pixels       |
-| `containerColor`       | `string` | `'transparent'` | Background color of the container        |
-| `containerBorderColor` | `string` | `'transparent'` | Border color of the container            |
-| `containerBorderWidth` | `number` | `0`             | Border width of the container in pixels  |
-| `containerRadius`      | `number` | `0`             | Border radius of the container in pixels |
-| `containerClass`       | `string` | `''`            | Additional CSS class for the container   |
+All appearance and behavior settings are grouped in a reactive `SwipeOptions` object:
 
-#### Track
+```typescript
+interface SwipeOptions {
+	width?: number;              // default: 400
+	height?: number;             // default: 56
+	threshold?: number;          // default: 80 (percentage, 0–100)
+	label?: string;              // default: 'Slide to confirm'
+	completeLabel?: string;      // default: 'Confirmed!'
 
-| Prop                 | Type     | Default         | Description                                       |
-| -------------------- | -------- | --------------- | ------------------------------------------------- |
-| `trackColor`         | `string` | `'#fff'`        | Background color of the track                     |
-| `completeTrackColor` | `string` | `'#4caf50'`     | Background color of the track when completed      |
-| `trackBorderColor`   | `string` | `'transparent'` | Border color of the track                         |
-| `trackBorderWidth`   | `number` | `1`             | Border width of the track in pixels               |
-| `trackRadius`        | `number` | `0`             | Border radius of the track in pixels              |
-| `trackClass`         | `string` | `''`            | Additional CSS class for the track                |
-| `completeTrackClass` | `string` | `''`            | Additional CSS class for the track when completed |
+	// Track
+	trackColor?: string;         // default: '#f3f4f6'
+	completeTrackColor?: string; // default: '#22c55e'
+	trackBorderColor?: string;   // default: '#d1d5db'
+	trackBorderWidth?: number;   // default: 1
+	trackRadius?: number;        // default: 10
 
-#### Thumb
+	// Thumb
+	thumbColor?: string;         // default: '#6b7280'
+	completeThumbColor?: string; // default: '#16a34a'
+	thumbRadius?: number;        // default: 8
 
-| Prop                 | Type     | Default  | Description                          |
-| -------------------- | -------- | -------- | ------------------------------------ |
-| `thumbColor`         | `string` | `'#ddd'` | Color of the thumb                   |
-| `completeThumbColor` | `string` | `'#ddd'` | Color of the thumb when completed    |
-| `thumbRadius`        | `number` | `0`      | Border radius of the thumb in pixels |
+	// Label
+	labelColor?: string;         // default: '#6b7280'
+	completeLabelColor?: string; // default: '#ffffff'
+}
+```
 
-#### Label
-
-| Prop                 | Type     | Default          | Description                                 |
-| -------------------- | -------- | ---------------- | ------------------------------------------- |
-| `label`              | `string` | `'Slide to ...'` | Text displayed on the slider                |
-| `labelColor`         | `string` | `'#000'`         | Color of the label text                     |
-| `labelClass`         | `string` | `''`             | Additional CSS class for the label          |
-| `completeLabel`      | `string` | `'Complete'`     | Text displayed when slider is completed     |
-| `completeLabelColor` | `string` | `'#000'`         | Color of the complete label text            |
-| `completeLabelClass` | `string` | `''`             | Additional CSS class for the complete label |
+All properties in `options` are individually reactive — changing any one triggers an immediate update.
 
 ### Event Handlers
 
-| Prop              | Type                                 | Description                                                            |
-| ----------------- | ------------------------------------ | ---------------------------------------------------------------------- |
-| `oncomplete`      | `function(event, isComplete, value)` | Called when the slider completes (passes threshold and is released)    |
-| `oncancel`        | `function(event, isComplete, value)` | Called when the slider is canceled (released before passing threshold) |
-| `onpassthreshold` | `function(event, side, value)`       | Called when the slider passes the threshold in either direction        |
+| Prop | Signature | Description |
+|---|---|---|
+| `oninput` | `(event: Event, value: number) => void` | Fires on every slider value change |
+| `oncomplete` | `(event: Event, isComplete: boolean, value: number) => void` | Fires when the slider completes (passes threshold and is released) |
+| `oncancel` | `(event: Event, isComplete: boolean, value: number) => void` | Fires when the slider is released before passing threshold |
+| `onpassthreshold` | `(event: Event, side: boolean, value: number) => void` | Fires when the threshold is crossed in either direction (`true` = pass, `false` = back) |
 
 ### Custom Icons
 
-| Prop        | Type      | Description                                                      |
-| ----------- | --------- | ---------------------------------------------------------------- |
-| `chevron`   | `Snippet` | Custom icon for the slider thumb (Svelte snippet)                |
-| `checkMark` | `Snippet` | Custom icon for the slider thumb when completed (Svelte snippet) |
+Two approaches for customizing the chevron and checkmark icons:
 
-## Examples
-
-### Basic Slide to Unlock
+**Approach 1 — SVG string props (reactive, no dependencies)**
 
 ```svelte
 <script>
-	import Swipe from 'svelte-swipe';
-	let unlocked = false;
+	import Swipe from 'svelte-swipe-to-action';
+
+	const chevronSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000" viewBox="0 0 256 256"><path d="..."/></svg>`;
+	const completeSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#000" viewBox="0 0 256 256"><path d="..."/></svg>`;
 </script>
 
 <Swipe
-	bind:status={unlocked}
-	label="Slide to unlock"
-	completeLabel="Unlocked!"
-	completeTrackColor="#4caf50"
-	threshold={75}
-/>
-
-{#if unlocked}
-	<p>Device unlocked!</p>
-{/if}
-```
-
-### Custom Styled Slider
-
-```svelte
-<script>
-	import Swipe from 'svelte-swipe';
-	let confirmed = false;
-</script>
-
-<Swipe
-	bind:status={confirmed}
-	width={300}
-	height={60}
-	containerRadius={30}
-	containerBorderWidth={2}
-	containerBorderColor="#ddd"
-	trackRadius={28}
-	trackColor="#f5f5f5"
-	completeTrackColor="#007bff"
-	thumbColor="#007bff"
-	completeThumbColor="#fff"
-	thumbRadius={28}
-	label="Swipe to confirm"
-	completeLabel="Confirmed!"
-	labelColor="#666"
-	completeLabelColor="#fff"
+	label="Slide to confirm"
+	chevronIconSvg={chevronSvg}
+	completeIconSvg={completeSvg}
 />
 ```
 
-### With Custom Icons
+String props are fully reactive — changing the SVG string instantly updates the icon.
+
+**Approach 2 — Snippets (for Svelte components)**
 
 ```svelte
 <script>
-	import Swipe from 'svelte-swipe';
+	import Swipe from 'svelte-swipe-to-action';
 	import { HandSwipeRight, Heart } from 'phosphor-svelte';
 </script>
 
 <Swipe label="Slide to confirm" completeLabel="Done!">
-	{#snippet chevron()}
+	{#snippet chevronIcon()}
 		<HandSwipeRight />
 	{/snippet}
-	{#snippet checkMark()}
+	{#snippet completeIcon()}
 		<Heart color="HotPink" weight="fill" />
 	{/snippet}
 </Swipe>
 ```
 
-### With Event Handlers
+Snippets accept any Svelte component. For reactivity when toggling snippet props, wrap `<Swipe>` in `{#key}`.
+
+### Other Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `id` | `string` | — | HTML id attribute on the range input |
+| `disabled` | `boolean` | `false` | Disables the slider |
+| `class` | `string` | — | Additional CSS class on the track element |
+| `rtl` | `boolean` | `false` | Right-to-left mode (sets `dir="rtl"` on track, swaps chevron direction) |
+
+## Examples
+
+### With Options Object
 
 ```svelte
 <script>
-	import Swipe from 'svelte-swipe';
-	let message = '';
+	import Swipe from 'svelte-swipe-to-action';
+
+	let status = $state(false);
+	let opts = $state({
+		width: 320,
+		height: 60,
+		threshold: 75,
+		label: 'Slide to unlock',
+		completeLabel: 'Unlocked!',
+		completeTrackColor: '#4caf50',
+		trackBorderRadius: 14,
+		thumbRadius: 12
+	});
+</script>
+
+<Swipe bind:status options={opts} />
+
+{#if status}
+	<p>Device unlocked!</p>
+{/if}
+```
+
+### With All Event Handlers
+
+```svelte
+<script>
+	import Swipe from 'svelte-swipe-to-action';
+
+	let message = $state('');
+	let status = $state(false);
 
 	function handleComplete(event, isComplete, value) {
 		message = 'Action completed!';
@@ -214,12 +188,18 @@ pnpm i svelte-swipe-to-action
 	function handleThreshold(event, side, value) {
 		message = side ? 'Passed threshold' : 'Below threshold';
 	}
+
+	function handleInput(event, value) {
+		console.log('Slider value:', value);
+	}
 </script>
 
 <Swipe
+	bind:status
 	oncomplete={handleComplete}
 	oncancel={handleCancel}
 	onpassthreshold={handleThreshold}
+	oninput={handleInput}
 	label="Slide to submit"
 	completeLabel="Submitted!"
 />
@@ -227,40 +207,32 @@ pnpm i svelte-swipe-to-action
 <p>{message}</p>
 ```
 
-## Development
+### RTL Support
 
-To run the development server:
-
-```bash
-npm run dev
+```svelte
+<Swipe rtl label="للحفظ" completeLabel="تم!" />
 ```
 
-To build the library:
+Sets `dir="rtl"` on the track element, swaps the chevron direction, and aligns the progress bar accordingly. No CSS transforms needed.
+
+## Development
 
 ```bash
-npm run build
+# Install dependencies
+pnpm install
+
+# Start dev server (demo page)
+pnpm dev
+
+# Build the library
+pnpm build
+
+# Type check
+pnpm check
 ```
 
 ## License
 
-MIT License
+MIT
 
-Copyright (c) 2023
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Copyright (c) 2026 Nutchapon (Kodaicoder)

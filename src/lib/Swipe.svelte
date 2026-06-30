@@ -1,64 +1,57 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
-	import type { ChangeEventHandler } from 'svelte/elements';
+	import { type Snippet } from 'svelte';
+	import ChevronDoubleRight from './ChevronDoubleRight.svelte';
+	import ChevronDoubleLeft from './ChevronDoubleLeft.svelte';
+	import CheckmarkCircle from './CheckmarkCircle.svelte';
+
+	export interface SwipeOptions {
+		/** The label displayed on the slider. Default: 'Slide to ...' */
+		label?: string;
+		/** The label displayed after confirmation. Default: 'Complete' */
+		completeLabel?: string;
+		/** The percentage of slide required to confirm (0-100). Default: 80 */
+		threshold?: number;
+		/** The width of the slider in pixels. Default: 400 */
+		width?: number;
+		/** The height of the slider in pixels. Default: 50 */
+		height?: number;
+		/** Right-to-left mode. Default: false */
+		rtlMode?: boolean;
+
+		// Track
+		trackColor?: string;
+		completeTrackColor?: string;
+		trackBorderColor?: string;
+		trackBorderWidth?: number;
+		trackRadius?: number;
+		trackClass?: string;
+		completeTrackClass?: string;
+
+		// Thumb
+		thumbColor?: string;
+		completeThumbColor?: string;
+		thumbRadius?: number;
+
+		// Label styling
+		labelColor?: string;
+		labelClass?: string;
+		completeLabelColor?: string;
+		completeLabelClass?: string;
+	}
 
 	export type SwipeProps = {
 		/** Whether the slider is checked (confirmed). */
 		status?: boolean;
 		/** The value of the slider. */
 		value?: number;
-		/** The padding of the container. (pixel unit) (default value is 0) */
-		containerPadding?: number;
-		/** The color of the container. */
-		containerColor?: string;
-		/** The border color of the container. */
-		containerBorderColor?: string;
-		/** The border width of the container.(pixel unit) (default value is 0) */
-		containerBorderWidth?: number;
-		/** The radius of the container.(pixel unit) (default value is 0) */
-		containerRadius?: number;
-		/** The class of the container. */
-		containerClass?: string;
-		/** The color of the track. */
-		trackColor?: string;
-		/** The color of the track after completed*/
-		completeTrackColor?: string;
-		/** The border color of the track. */
-		trackBorderColor?: string;
-		/** The border width of the track. (pixel unit) (default value is 1)*/
-		trackBorderWidth?: number;
-		/** The radius of the track. (pixel unit) (default value is 0)*/
-		trackRadius?: number;
-		/** The class of the track. */
-		trackClass?: string;
-		/** The class of the track on completed */
-		completeTrackClass?: string;
-		/** The color of the thumb. */
-		thumbColor?: string;
-		/** The color of the thumb on completed. */
-		completeThumbColor?: string;
-		/** The radius of the thumb. (pixel unit) (default value is 0)*/
-		thumbRadius?: number;
-		/** The label displayed on the slider. */
-		label?: string;
-		/** The color of the label. */
-		labelColor?: string;
-		/** The class of the label. */
-		labelClass?: string;
-		/** The label displayed after confirmation. */
-		completeLabel?: string;
-		/** The color of the label after confirmation. */
-		completeLabelColor?: string;
-		/** The class of the label after confirmation. */
-		completeLabelClass?: string;
-		/** The percentage of slide required to confirm (0-100). (default value is 80) */
-		threshold?: number;
-		/** The width of the slider. (default value is 400) */
-		width?: number;
-		/** The height of the slider. (default value is 50) */
-		height?: number;
-		/** Right to left mode (default is disable)*/
-		rtlMode?: boolean;
+		/** Whether the slider is being held. */
+		hold?: boolean;
+
+		/** All appearance/layout options in one object. */
+		options?: SwipeOptions;
+
+		/** Callback function triggered when the slider value changes while dragging. */
+		oninput?: (event: Event, value: number) => void;
 		/** Callback function triggered when the slider is checked. */
 		oncomplete?: (event: Event, isComplete: boolean, value: number) => void;
 		/** Callback function triggered when the slider is canceled. */
@@ -66,9 +59,13 @@
 		/** Callback function triggered when the slider passes the threshold. */
 		onpassthreshold?: (event: Event, side: boolean, value: number) => void;
 		/** The icon displayed on the slider thumb.(Svelte Snippet) */
-		chevron?: Snippet;
+		chevronIcon?: Snippet;
 		/** The icon displayed on the slider thumb after confirmation.(Svelte Snippet) */
-		checkMark?: Snippet;
+		completeIcon?: Snippet;
+		/** Raw SVG markup for the chevron icon (used instead of snippet when provided). */
+		chevronIconSvg?: string;
+		/** Raw SVG markup for the complete icon. */
+		completeIconSvg?: string;
 		/** Any additional props. */
 		[key: string]: unknown;
 	};
@@ -76,69 +73,62 @@
 		status = $bindable(false),
 		value = $bindable(status ? 100 : 0),
 		hold = $bindable(false),
-		containerPadding = $bindable(0),
-		containerColor = $bindable('transparent'),
-		containerBorderColor = $bindable('transparent'),
-		containerBorderWidth = $bindable(0),
-		containerRadius = $bindable(0),
-		containerClass = '',
-		trackColor = $bindable('#fff'),
-		completeTrackColor = $bindable('#4caf50'),
-		trackBorderColor = $bindable('transparent'),
-		trackBorderWidth = $bindable(1),
-		trackRadius = $bindable(0),
-		trackClass = '',
-		completeTrackClass = '',
-		thumbColor = $bindable('#ddd'),
-		completeThumbColor = $bindable('#ddd'),
-		thumbRadius = $bindable(0),
-		label = $bindable('Slide to ...'),
-		labelColor = $bindable('#000'),
-		labelClass = '',
-		completeLabel = $bindable('Complete'),
-		completeLabelColor = $bindable('#000'),
-		completeLabelClass = '',
-		threshold = $bindable(80),
-		width = $bindable(400),
-		height = $bindable(50),
-		rtlMode = $bindable(false),
+		options = {},
+		oninput = () => {},
 		oncomplete = () => {},
 		oncancel = () => {},
 		onpassthreshold = () => {},
-		chevron,
-		checkMark,
+		chevronIcon,
+		completeIcon,
+		chevronIconSvg,
+		completeIconSvg,
 		...rest
 	}: SwipeProps = $props();
 
+	const label = $derived(options.label ?? 'Slide to ...');
+	const completeLabel = $derived(options.completeLabel ?? 'Complete');
+	const threshold = $derived(options.threshold ?? 80);
+	const width = $derived(options.width ?? 400);
+	const height = $derived(options.height ?? 50);
+	const rtlMode = $derived(options.rtlMode ?? false);
+	const trackColor = $derived(options.trackColor ?? '#ffffff');
+	const completeTrackColor = $derived(options.completeTrackColor ?? '#4caf50');
+	const trackBorderColor = $derived(options.trackBorderColor ?? 'transparent');
+	const trackBorderWidth = $derived(options.trackBorderWidth ?? 1);
+	const trackRadius = $derived(options.trackRadius ?? 0);
+	const trackClass = $derived(options.trackClass ?? '');
+	const completeTrackClass = $derived(options.completeTrackClass ?? '');
+	const thumbColor = $derived(options.thumbColor ?? '#dddddd');
+	const completeThumbColor = $derived(options.completeThumbColor ?? '#dddddd');
+	const thumbRadius = $derived(options.thumbRadius ?? 0);
+	const labelColor = $derived(options.labelColor ?? '#000000');
+	const labelClass = $derived(options.labelClass ?? '');
+	const completeLabelColor = $derived(options.completeLabelColor ?? '#000000');
+	const completeLabelClass = $derived(options.completeLabelClass ?? '');
+
 	let sliderValue = $state(status ? 100 : 0);
+	let focused = $state(false);
+
+	$effect(() => {
+		sliderValue = status ? 100 : 0;
+	});
+
 	let chevronContainer: HTMLDivElement;
 	let checkMarkContainer: HTMLDivElement;
 	let chevronUri = $state('');
 	let checkMarkUri = $state('');
-	let readjustThreshold = $derived.by(() => {
-		return threshold > 100 ? (threshold = 100) : threshold;
-	});
+	let readjustThreshold = $derived.by(() => Math.min(threshold, 100));
+
+	function toBase64(str: string): string {
+		const bytes = new TextEncoder().encode(str);
+		const binString = String.fromCharCode(...bytes);
+		return btoa(binString);
+	}
 	// Track threshold passing state
 	let hasPassedThresholdForward = $state(false);
 	let hasPassedThresholdBackward = $state(false);
 	let passThreshold = $derived.by(() => {
 		return sliderValue >= readjustThreshold;
-	});
-
-	let isComplete = $derived.by(() => {
-		if (!hold) {
-			return sliderValue >= readjustThreshold;
-		} else {
-			return false;
-		}
-	});
-
-	let transitionProgress = $derived.by(() => {
-		if (sliderValue >= readjustThreshold - 30) {
-			return Math.min(1, (sliderValue - (readjustThreshold - 30)) / 10);
-		} else {
-			return 0;
-		}
 	});
 
 	let adjustedProgressWidth = $derived.by(() => {
@@ -147,9 +137,9 @@
 		const progressPercentage = sliderValue / 100;
 		return Math.max(0, Math.min(width, progressPercentage * availableWidth + thumbOffset)) + 'px';
 	});
-	function oninput(ev: Event) {
-		hold = true;
+	function handleInput(ev: Event) {
 		value = sliderValue;
+		oninput(ev, sliderValue);
 
 		const isPastThreshold = sliderValue >= readjustThreshold;
 
@@ -166,23 +156,24 @@
 
 	function onchange(ev: Event) {
 		hold = false;
-		isComplete ? (sliderValue = 100) : (sliderValue = 0);
-		if (isComplete) {
+		const completed = sliderValue >= readjustThreshold;
+		completed ? (sliderValue = 100) : (sliderValue = 0);
+		if (completed) {
+			status = true;
 			value = 100;
-			oncomplete(ev, isComplete, sliderValue);
+			oncomplete(ev, true, sliderValue);
 			hasPassedThresholdForward = false;
 			hasPassedThresholdBackward = true;
 		} else {
+			status = false;
 			value = 0;
-			oncancel(ev, isComplete, sliderValue);
+			oncancel(ev, false, sliderValue);
 			hasPassedThresholdForward = true;
 			hasPassedThresholdBackward = false;
 		}
 	}
 
 	function onkeyup(ev: KeyboardEvent) {
-		//if it enter key then should set value too 100
-		console.log(ev.key);
 		if (ev.key.toLowerCase() !== 'enter') {
 			ev.preventDefault();
 			return;
@@ -203,136 +194,116 @@
 
 	$effect(() => {
 		rtlMode;
-		if (chevronContainer) {
+
+		if (chevronIconSvg) {
+			chevronUri = `data:image/svg+xml;base64,${toBase64(chevronIconSvg.trim())}`;
+		} else if (chevronContainer) {
 			const svgHtml = chevronContainer.innerHTML;
 			const cleanSvgHtml = svgHtml.replace(/>\s+</g, '><').trim();
-			chevronUri = `data:image/svg+xml;base64,${btoa(cleanSvgHtml)}`;
+			chevronUri = `data:image/svg+xml;base64,${toBase64(cleanSvgHtml)}`;
 		}
-		if (checkMarkContainer) {
+
+		if (completeIconSvg) {
+			checkMarkUri = `data:image/svg+xml;base64,${toBase64(completeIconSvg.trim())}`;
+		} else if (checkMarkContainer) {
 			const svgHtml = checkMarkContainer.innerHTML;
 			const cleanSvgHtml = svgHtml.replace(/>\s+</g, '><').trim();
-			checkMarkUri = `data:image/svg+xml;base64,${btoa(cleanSvgHtml)}`;
+			checkMarkUri = `data:image/svg+xml;base64,${toBase64(cleanSvgHtml)}`;
 		}
-	});
-
-	$effect(() => {
-		status = isComplete;
 	});
 </script>
 
 <div bind:this={chevronContainer} style="display: none;">
-	{#if chevron}
-		{@render chevron()}
+	{#if chevronIcon}
+		{@render chevronIcon()}
 	{:else}
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-			<path
-				fill="currentColor"
-				d="M12.293 5.293a1 1 0 0 1 1.414 0l6 6a1 1 0 0 1 0 1.414l-6 6a1 1 0 0 1-1.414-1.414L17.586 12l-5.293-5.293a1 1 0 0 1 0-1.414m-6 0a1 1 0 0 1 1.414 0l6 6a1 1 0 0 1 0 1.414l-6 6a1 1 0 0 1-1.414-1.414L11.586 12L6.293 6.707a1 1 0 0 1 0-1.414"
-			/>
-		</svg>
+		{#if rtlMode}
+			<ChevronDoubleLeft />
+		{:else}
+			<ChevronDoubleRight />
+		{/if}
 	{/if}
 </div>
 <div bind:this={checkMarkContainer} style="display: none;">
-	{#if checkMark}
-		{@render checkMark()}
+	{#if completeIcon}
+		{@render completeIcon()}
 	{:else}
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			style={`transform: scaleX(${rtlMode ? -1 : 1})`}
-		>
-			<path
-				fill="currentColor"
-				d="M9.86 18a1 1 0 0 1-.73-.32l-4.86-5.17a1 1 0 1 1 1.46-1.37l4.12 4.39l8.41-9.2a1 1 0 1 1 1.48 1.34l-9.14 10a1 1 0 0 1-.73.33Z"
-			/>
-		</svg>
+		<CheckmarkCircle />
 	{/if}
 </div>
 
 <div
 	style:--width={width + 'px'}
 	style:--height={height + 'px'}
-	style:--container__padding={containerPadding + 'px'}
-	style:--container__color={`${containerColor}`}
-	style:--container__border-color={containerBorderColor}
-	style:--container__border-width={containerBorderWidth + 'px'}
-	style:--container__radius={containerRadius + 'px'}
-	style:--transform__scaleX={`${rtlMode ? -1 : 1}`}
-	class={`container ${containerClass}`}
+	dir={rtlMode ? 'rtl' : undefined}
+	style:--track__color={trackColor}
+	style:--track__border-color={trackBorderColor}
+	style:--track__border-width={trackBorderWidth + 'px'}
+	style:--track__radius={trackRadius + 'px'}
+	class={`track ${trackClass}`.trim()}
+	class:focused
 >
-	<div
-		style:--track__color={trackColor}
-		style:--track__border-color={trackBorderColor}
-		style:--track__border-width={trackBorderWidth + 'px'}
-		style:--track__radius={trackRadius + 'px'}
-		class={`track ${trackClass}`}
+	<p
+		class={`label ${labelClass}`}
+		style:--label__opacity={(100 - sliderValue * 1.5) / 100}
+		style:--label__color={labelColor}
 	>
-		<p
-			class={`label ${labelClass}`}
-			style:--label__opacity={(100 - sliderValue * 1.5) / 100}
-			style:--label__color={labelColor}
-		>
-			{label}
-		</p>
-		<p
-			class={`complete_label  ${completeLabelClass}`}
-			style:--complete_label__opacity={sliderValue / 100}
-			style:--complete_label__color={completeLabelColor}
-		>
-			{completeLabel}
-		</p>
+		{label}
+	</p>
+	<p
+		class={`complete_label  ${completeLabelClass}`}
+		style:--complete_label__opacity={sliderValue / 100}
+		style:--complete_label__color={completeLabelColor}
+	>
+		{completeLabel}
+	</p>
 
-		<div
-			class={`progressbar ${completeTrackClass}`}
-			style:--progress={adjustedProgressWidth}
-			style:--complete_track-color={completeTrackColor}
-		></div>
-		<input
-			{...rest}
-			type="range"
-			min="0"
-			max="100"
-			aria-label={label}
-			aria-valuemin="0"
-			aria-valuemax="100"
-			aria-valuenow={sliderValue}
-			aria-details={`${label} with passed value at ${passThreshold}, you can press 'Enter' to change a state.`}
-			aria-live="assertive"
-			aria-disabled={!!rest.disabled}
-			bind:value={sliderValue}
-			{oninput}
-			{onchange}
-			{onkeyup}
-			style={`width: ${width}px`}
-			style:--thumb__color={passThreshold ? completeThumbColor : thumbColor}
-			style:--thumb__radius={thumbRadius + 'px'}
-			style:--transitionProgress={transitionProgress}
-			style:--icon={sliderValue > threshold ? `url("${checkMarkUri}")` : `url("${chevronUri}")`}
-			class={`input-range`}
-		/>
-	</div>
+	<div
+		class={`progressbar ${completeTrackClass}`}
+		aria-hidden="true"
+		style:left={rtlMode ? undefined : '0'}
+		style:right={rtlMode ? '0' : undefined}
+		style:--progress={adjustedProgressWidth}
+		style:--complete_track-color={completeTrackColor}
+	></div>
+	<input
+		{...rest}
+		type="range"
+		onpointerdown={() => (hold = true)}
+		onpointerup={() => (hold = false)}
+		onpointercancel={() => (hold = false)}
+		onfocus={() => (focused = true)}
+		onblur={() => (focused = false)}
+		min="0"
+		max="100"
+		aria-label={label}
+		aria-valuemin="0"
+		aria-valuemax="100"
+		aria-valuenow={sliderValue}
+		aria-valuetext={status ? completeLabel : label}
+		aria-live="assertive"
+		aria-disabled={!!rest.disabled}
+		bind:value={sliderValue}
+		oninput={handleInput}
+		{onchange}
+		{onkeyup}
+		style={`width: ${width}px`}
+		style:--thumb__color={passThreshold ? completeThumbColor : thumbColor}
+		style:--thumb__radius={thumbRadius + 'px'}
+		style:--thumb__hold={hold
+			? 'inset 2px 2px 4px rgba(0,0,0,0.3), 1px 1px 2px rgba(0,0,0,0.2)'
+			: '0 1px 3px rgba(0,0,0,0.15)'}
+		style:--icon={sliderValue > readjustThreshold
+			? `url("${checkMarkUri}")`
+			: `url("${chevronUri}")`}
+		class={`input-range`}
+	/>
 </div>
 
 <style>
-	.container,
-	.container > * {
+	.track,
+	.track > * {
 		box-sizing: border-box;
-	}
-	.container {
-		width: fit-content;
-		overflow: hidden;
-		padding: var(--container__padding);
-		background-color: var(--container__color);
-		border-radius: var(--container__radius);
-		border: var(--container__border-width) solid var(--container__border-color);
-		transform: scaleX(var(--transform__scaleX));
-	}
-	.container:has(.input-range:focus) {
-		/* outline: 2px solid var(--container__border-color); */
-		outline: 2px solid black;
-		outline-offset: 2px;
 	}
 	.track {
 		width: var(--width);
@@ -345,12 +316,18 @@
 		border: var(--track__border-width) solid var(--track__border-color);
 		background-color: var(--track__color, #fff);
 	}
+	.track:has(.input-range:focus),
+	.track.focused {
+		outline: 2px solid var(--track__border-color, black);
+		outline-offset: 2px;
+	}
 	/* Basic styling for the slider track */
 	.input-range {
 		margin: 0;
 		border: 0;
 		width: 100%;
 		-webkit-appearance: none;
+		appearance: none;
 		background: transparent;
 		z-index: 20;
 		outline: none;
@@ -370,10 +347,12 @@
 		background-position: center;
 		cursor: pointer;
 		pointer-events: all;
+		box-shadow: var(--thumb__hold);
+		transition: box-shadow 0.1s ease;
 	}
 
 	.input-range::-moz-range-thumb {
-		-webkit-appearance: none;
+		appearance: none;
 		height: var(--height);
 		width: var(--height);
 		border-radius: var(--thumb__radius);
@@ -384,6 +363,21 @@
 		background-position: center;
 		cursor: pointer;
 		pointer-events: all;
+		box-shadow: var(--thumb__hold);
+		transition: box-shadow 0.1s ease;
+	}
+
+	.input-range:disabled {
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
+
+	.input-range:disabled::-webkit-slider-thumb {
+		cursor: not-allowed;
+	}
+
+	.input-range:disabled::-moz-range-thumb {
+		cursor: not-allowed;
 	}
 
 	.label {
@@ -391,7 +385,7 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%) scaleX(var(--transform__scaleX));
+		transform: translate(-50%, -50%);
 		z-index: 5;
 		opacity: var(--label__opacity);
 		color: var(--label__color);
@@ -402,7 +396,7 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%) scaleX(var(--transform__scaleX));
+		transform: translate(-50%, -50%);
 		z-index: 5;
 		opacity: var(--complete_label__opacity);
 		color: var(--complete_label__color);
