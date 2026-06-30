@@ -24,15 +24,16 @@ pnpm add svelte-swipe-to-action
 ```svelte
 <script>
 	import Swipe from 'svelte-swipe-to-action';
+	import type { SwipeOptions } from 'svelte-swipe-to-action';
 
-	let confirmed = $state(false);
+	let status = $state(false);
+	const opts: SwipeOptions = {
+		label: 'Slide to confirm',
+		completeLabel: 'Confirmed!'
+	};
 </script>
 
-<Swipe
-	label="Slide to confirm"
-	completeLabel="Confirmed!"
-	bind:status={confirmed}
-/>
+<Swipe options={opts} bind:status />
 ```
 
 ## API
@@ -53,31 +54,50 @@ All appearance and behavior settings are grouped in a reactive `SwipeOptions` ob
 
 ```typescript
 interface SwipeOptions {
+	// Sizing & behavior
 	width?: number;              // default: 400
-	height?: number;             // default: 56
+	height?: number;             // default: 50
 	threshold?: number;          // default: 80 (percentage, 0–100)
-	label?: string;              // default: 'Slide to confirm'
-	completeLabel?: string;      // default: 'Confirmed!'
+	label?: string;              // default: 'Slide to ...'
+	completeLabel?: string;      // default: 'Complete'
+	rtlMode?: boolean;           // default: false
+	labelSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';  // default: 'md'
 
 	// Track
-	trackColor?: string;         // default: '#f3f4f6'
-	completeTrackColor?: string; // default: '#22c55e'
-	trackBorderColor?: string;   // default: '#d1d5db'
+	trackColor?: string;         // default: '#ffffff'
+	completeTrackColor?: string; // default: '#4caf50'
+	trackBorderColor?: string;   // default: 'transparent'
 	trackBorderWidth?: number;   // default: 1
-	trackRadius?: number;        // default: 10
+	trackRadius?: number;        // default: 0
+	trackClass?: string;         // default: ''
+	completeTrackClass?: string; // default: ''
 
 	// Thumb
-	thumbColor?: string;         // default: '#6b7280'
-	completeThumbColor?: string; // default: '#16a34a'
-	thumbRadius?: number;        // default: 8
+	thumbColor?: string;         // default: '#dddddd'
+	completeThumbColor?: string; // default: '#dddddd'
+	thumbRadius?: number;        // default: 0
 
-	// Label
-	labelColor?: string;         // default: '#6b7280'
-	completeLabelColor?: string; // default: '#ffffff'
+	// Label styling
+	labelColor?: string;         // default: '#000000'
+	labelClass?: string;         // default: ''
+	completeLabelColor?: string; // default: '#000000'
+	completeLabelClass?: string; // default: ''
 }
 ```
 
 All properties in `options` are individually reactive — changing any one triggers an immediate update.
+
+### `labelSize` Presets
+
+| Size | Multiplier | At 50px height | At 80px height |
+|------|-----------|----------------|----------------|
+| `xs` | 0.20 | 10px | 16px |
+| `sm` | 0.28 | 14px | 22.4px |
+| `md` | 0.35 | 17.5px | 24px (clamped) |
+| `lg` | 0.45 | 22.5px | 24px (clamped) |
+| `xl` | 0.55 | 24px (clamped) | 24px (clamped) |
+
+Font size is clamped between 10px and 24px. Labels that exceed the track width are truncated with an ellipsis (`…`).
 
 ### Event Handlers
 
@@ -103,7 +123,7 @@ Two approaches for customizing the chevron and checkmark icons:
 </script>
 
 <Swipe
-	label="Slide to confirm"
+	options={{ label: 'Slide to confirm' }}
 	chevronIconSvg={chevronSvg}
 	completeIconSvg={completeSvg}
 />
@@ -119,7 +139,7 @@ String props are fully reactive — changing the SVG string instantly updates th
 	import { HandSwipeRight, Heart } from 'phosphor-svelte';
 </script>
 
-<Swipe label="Slide to confirm" completeLabel="Done!">
+<Swipe options={{ label: 'Slide to confirm', completeLabel: 'Done!' }}>
 	{#snippet chevronIcon()}
 		<HandSwipeRight />
 	{/snippet}
@@ -133,12 +153,13 @@ Snippets accept any Svelte component. For reactivity when toggling snippet props
 
 ### Other Props
 
-| Prop | Type | Default | Description |
-|---|---|---|---|
-| `id` | `string` | — | HTML id attribute on the range input |
-| `disabled` | `boolean` | `false` | Disables the slider |
-| `class` | `string` | — | Additional CSS class on the track element |
-| `rtl` | `boolean` | `false` | Right-to-left mode (sets `dir="rtl"` on track, swaps chevron direction) |
+Any additional HTML attributes are spread onto the underlying `<input type="range">` element:
+
+| Prop | Type | Description |
+|---|---|---|
+| `id` | `string` | HTML id attribute on the range input |
+| `disabled` | `boolean` | Disables the slider |
+| `class` | `string` | Additional CSS class on the track element |
 
 ## Examples
 
@@ -156,7 +177,7 @@ Snippets accept any Svelte component. For reactivity when toggling snippet props
 		label: 'Slide to unlock',
 		completeLabel: 'Unlocked!',
 		completeTrackColor: '#4caf50',
-		trackBorderRadius: 14,
+		trackRadius: 14,
 		thumbRadius: 12
 	});
 </script>
@@ -176,6 +197,10 @@ Snippets accept any Svelte component. For reactivity when toggling snippet props
 
 	let message = $state('');
 	let status = $state(false);
+	const opts = $state({
+		label: 'Slide to submit',
+		completeLabel: 'Submitted!'
+	});
 
 	function handleComplete(event, isComplete, value) {
 		message = 'Action completed!';
@@ -195,13 +220,12 @@ Snippets accept any Svelte component. For reactivity when toggling snippet props
 </script>
 
 <Swipe
+	options={opts}
 	bind:status
 	oncomplete={handleComplete}
 	oncancel={handleCancel}
 	onpassthreshold={handleThreshold}
 	oninput={handleInput}
-	label="Slide to submit"
-	completeLabel="Submitted!"
 />
 
 <p>{message}</p>
@@ -210,10 +234,20 @@ Snippets accept any Svelte component. For reactivity when toggling snippet props
 ### RTL Support
 
 ```svelte
-<Swipe rtl label="للحفظ" completeLabel="تم!" />
+<script>
+	import Swipe from 'svelte-swipe-to-action';
+
+	const opts = $state({
+		rtlMode: true,
+		label: 'للتأكيد',
+		completeLabel: 'تم!'
+	});
+</script>
+
+<Swipe options={opts} />
 ```
 
-Sets `dir="rtl"` on the track element, swaps the chevron direction, and aligns the progress bar accordingly. No CSS transforms needed.
+Sets `dir="rtl"` on the track element, swaps the chevron direction, and aligns the progress bar from the right. No CSS transforms needed.
 
 ## Development
 
