@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2026-06-30
+
+### Fixed
+
+- Vercel build failure: replaced `@sveltejs/adapter-auto` with `@sveltejs/adapter-vercel` directly to avoid auto-install error during build
+
 ## [1.0.0] - 2026-06-30
 
 ### Breaking Changes
